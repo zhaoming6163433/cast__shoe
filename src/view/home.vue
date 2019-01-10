@@ -4,6 +4,7 @@
             <div v-for="(item,index) in roomlist" :key="index" class="roomitem" @click="gotodetail(item)">
                 <span>{{item.roominfo.roomname}}</span>
                 <span>{{item.roominfo.thingdesc}}</span>
+                <div v-if="item.createrip==userip" class="delroom" @click="delroom(item,$event)"><img src="../../static/img/delete.png"/></div>
             </div>
         </div>
         <div class="addroom" @click="createroom"><img src="../../static/img/icon_jia.png"/></div>
@@ -23,6 +24,7 @@ export default {
         return {
             infomation: "",
             socket: "",
+            userip:"",
             roomlist:[]//房间列表
         }
     },
@@ -36,8 +38,9 @@ export default {
         //获取房间列表
         get_info() {
             this.socket.emit('getroomlist');
-            this.socket.on('roomlist',  (data)=> {
+            this.socket.on('roomlist',  (data,ip)=> {
                 this.roomlist = data;
+                this.userip = ip;
             });
         },
         //创建房间
@@ -46,22 +49,21 @@ export default {
         },
         //房间详情
         gotodetail(item){
+            this.$router.push({"name":"room",query:{roomid:item.roomid}});
+        },
+        //删除房间
+        delroom(item,e){
+            e.stopPropagation();
+            this.$messagebox.confirm('删除后不可恢复，确认删除此房间？','').then(() => {
+                this.socket.emit('delroom',item);
+            },() => {
 
+            });
         }
     },
     mounted() {
         this.socket = util.vueSocket;
         this.get_info();
-        //告诉服务器端有用户进入
-        // this.socket.emit('joinroom', {roomid:"1"});
-        // this.socket.emit('joinroom', {roomid:"2"});
-        // this.socket.emit('joinroom', {roomid:"1"});
-        // this.socket.on('news', function (data) {
-        //     console.log(data);
-        // });
-        // setTimeout(()=>{
-        //     this.socket.emit('logout', {roomid:"1"});
-        // },1000)
     }
 }
 
@@ -74,19 +76,27 @@ export default {
             display: flex;
             flex-direction:row;
             flex-wrap:wrap;
-            justify-content:space-between;
+            justify-content:space-around;
             padding:1rem;
+            margin-bottom:5rem;
             .roomitem{
-                width:28%;
-                height:6rem;
+                width:100%;
+                height:7.5rem;
                 margin-top:1rem;
                 padding: 0.5rem;
                 box-shadow: 0px 1px 3px rgb(190, 190, 190);
                 background-color: #FFFFFF;
                 border: 1px solid #CCC;
                 border-radius: 1rem;
+                position: relative;
                 span:nth-child(1){
-                    font-size:1.4rem;
+                    font-size:1.6rem;
+                    width: 100%;
+                    display:-webkit-box;
+                    -webkit-box-orient:vertical;
+                    text-overflow:ellipsis;
+                    overflow:hidden;
+                    -webkit-line-clamp:1;
                 }
                 span:nth-child(2){
                     margin-top:.5rem;
@@ -97,6 +107,15 @@ export default {
                     text-overflow:ellipsis;
                     overflow:hidden;
                     -webkit-line-clamp:2;
+                }
+                .delroom{
+                    position: absolute;
+                    width: 2rem;
+                    bottom:0;
+                    right:1rem;
+                    img{
+                        width:100%;
+                    }
                 }
             }
         }

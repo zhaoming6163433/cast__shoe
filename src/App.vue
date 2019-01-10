@@ -20,7 +20,8 @@ export default {
       showLoading: false,
       titlename: {
         'home': '房间列表',
-        'castshoe': '吃饭单机版'
+        'castshoe': '吃饭单机版',
+        'room':'房间详情'
       }
     }
   },
@@ -42,7 +43,7 @@ export default {
     //首次进入页面设置标题
     this.firstitle()
     //连接websocket后端服务器
-    util.vueSocket = io.connect("http://10.13.48.28:3011");
+    util.vueSocket = io.connect(appConfigs.urlWebHttp);
   },
   methods: {
     //第一次进入页面也判断标题
@@ -80,11 +81,14 @@ export default {
   text-align: center;
   color: #000000;
   font-size: 16px;
+  height:100%;
 }
 
-body {
+html,body {
   overflow-x: hidden;
   min-width: 320px;
+  width:100%;
+  height:100%;
 }
 
 body,

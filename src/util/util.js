@@ -11,7 +11,7 @@ const vueSocket = Vue.prototype.vueSocket;
 
 const utils = {
     vueSocket:vueSocket,
-	vueEvent:vueEvent,
+    vueEvent:vueEvent,
 	//打电话
 	realcall(e){
         window.location.href = "tel:"+ e.name;

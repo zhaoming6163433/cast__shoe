@@ -60,6 +60,10 @@ export default {
         },
         //提交创建房间
         submit(){
+            this.addthinglist.forEach((item,index)=>{
+                item.id = index.toString();
+                item.num = 0;
+            });
             var params={roomname:this.roomname,thingdesc:this.thingdesc,addthinglist:this.addthinglist};
             util.vueSocket.emit('createroom',params);
             Object.assign(this.$data, this.$options.data());
