@@ -21,7 +21,7 @@ switch (process.env.srconfig) {
 		urlWebHttp = 'https://devo2o.zhiscity.com';
 		break;
 	case 'pro':
-		urlWebHttp = 'https://drugo2o.zhiscity.com';
+		urlWebHttp = 'http://socket.todaypocket.cn';
 		break;
 	case 'testdev':
 		urlWebHttp = 'https://devtesto2o.zhiscity.com';

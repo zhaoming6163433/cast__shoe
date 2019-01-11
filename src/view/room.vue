@@ -156,14 +156,14 @@ export default {
                 left: 0;
                 margin-left: -2rem;
                 width: 2.5rem;
-                transition: left 2s;
+                transition: left 1s;
             }
             .selin {
                 width: 0%;
                 background-color: #fff;
                 height: 0.3rem;
                 border-radius: 3rem 3rem 3rem 3rem;
-                transition: width 2s;
+                transition: width 1s;
             }
             .rightspan {
                 display: inline-block;
