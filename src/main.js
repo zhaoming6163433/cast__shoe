@@ -9,6 +9,7 @@ import router from './router'
 import VueResource from 'vue-resource'
 import vueutil from './util/vueutil.js'
 import store from './store'
+import '../static/css/animate.min.css'
 
 //阻止vue在启动时生成生产提示
 Vue.config.productionTip = false

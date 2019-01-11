@@ -34,6 +34,10 @@ export default{
     Vue.filter("timeymdhmshandle", function(time) {
 	    return time==''?'':new Date(time).Format("yyyy年MM月dd日 hh:mm:ss");
     });
+    //房间状态 0进行中 1已截止
+    Vue.filter("roomstate", function(state) {
+	    return state==0?'进行中':'已截止';
+    });
     //返回上一页
     Vue.prototype.goback = function(){
 		this.$router.go(-1);

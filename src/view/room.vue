@@ -14,6 +14,7 @@
         </div>
       </div>
       <div v-show="selinfo2" class="selinfo2">
+          <div class="activend" v-if="info.roomflag==1"><img src="../../static/img/activend.png" ></div>
           <ul>
               <li v-for="(item,index) in addthinglist" :key="index">
                   <div class="title2">{{item.addthingsel}}</div>
@@ -23,6 +24,11 @@
                   </div>
               </li>
           </ul>
+      </div>
+      <div class="result animated flash" v-if="info.roomresultflag"><div>最终结果</div><div>{{info.roomresult&&info.roomresult.addthingsel}}</div></div>
+      <div v-if="info.createrip==ip&&info.roomflag==1&&info.roomresultflag!=true" class="resultyes">
+          <mt-button type="default" size="small" @click="zhijieresult">直接产生结果</mt-button>
+          <mt-button type="default" size="small">随机产生结果</mt-button>
       </div>
   </div>
 </template>
@@ -57,6 +63,10 @@ export default {
         submit() {
             //提交后修改房间信息然后分发各个用户roominfo
             util.vueSocket.emit('submitroom', { roomid: this.roomid, thingval: this.thingval });
+        },
+        //直接产生结果
+        zhijieresult(){
+            util.vueSocket.emit('zhijieresult', { roomid: this.roomid});
         }
     },
     mounted() {
@@ -68,6 +78,7 @@ export default {
         //加入后展示房间信息
         util.vueSocket.on('roominfo', (data, ip) => {
             console.log(data)
+            this.ip = ip;
             document.title = data.roominfo.roomname;
             this.info = data;
             let arr = [];
@@ -80,7 +91,7 @@ export default {
             this.options = arr;
             this.showsubmit = true;
             //如果包含ip说明已经选择过了
-            if (data.selectediparr.indexOf(ip) > -1) {
+            if (data.selectediparr.indexOf(ip) > -1||data.roomflag==1) {
                 this.selinfo2 = true;
                 this.selinfo1 = false;
             } else {
@@ -91,7 +102,11 @@ export default {
             let _arrlist = data.roominfo.addthinglist;
             setTimeout(() => {
                 _arrlist.forEach(item => {
-                    item.width = (item.num / totalnum) * 100 + "%";
+                    if(totalnum==0){
+                        item.width = '0%';
+                    }else{
+                        item.width = (item.num / totalnum) * 100 + "%";
+                    }
                 });
                 thisview.addthinglist = [];
                 thisview.addthinglist = _arrlist;
@@ -107,10 +122,13 @@ export default {
 .mint-radiolist .mint-cell{
     background: rgba(255,255,255,0.3);
 }
+.mint-cell-wrapper{
+    background-image:none;
+}
 </style>
 <style lang="scss" scoped>
 .room {
-    background: url("../../static/img/vipback.png") no-repeat;
+    background: url("../../static/img/vipback.png") repeat;
     background-size: 100%;
     width: 100%;
     height: 100%;
@@ -133,6 +151,16 @@ export default {
     }
     .selinfo2 {
         text-align: left;
+        .activend{
+            position: absolute;
+            top:10rem;
+            left:11rem;
+            width:15rem;
+            img{
+                width:100%;
+                opacity:0.5;
+            }
+        }
         .title2 {
             text-align:right;
             margin-top: 1rem;
@@ -143,10 +171,10 @@ export default {
                 0 0 40px #ff0000, 0 0 70px #ff0000, 0 0 80px #ff0000,
                 0 0 100px #ff0000, 0 0 150px #ff0000;
             color: #fff;
-            width: 7rem;
+            width: 8rem;
         }
         .selnum {
-            width: 52%;
+            width: 50%;
             height: 0.5rem;
             display: inline-block;
             position: relative;
@@ -175,6 +203,31 @@ export default {
                 font-size: 1rem;
             }
         }
+    }
+    .resultyes{
+        position: absolute;
+        bottom:1rem;
+        width: 100%;
+        text-algin:center;
+        button{
+            background-color: rgba(255,255,255,0.8);
+        }
+    }
+    .result{
+            width: 15rem;
+            position: absolute;
+            background-color: rgba(255,255,255,0.3);
+            border-radius: 1rem;
+            font-size: 3rem;
+            color: #fff;
+            text-align: center;
+            left: 50%;
+            margin-left: -7.5rem;
+            >div{
+                word-wrap:break-word;
+            }
+            animation-duration:4s;
+            animation-iteration-count: infinite;
     }
 }
 </style>

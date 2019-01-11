@@ -32,6 +32,7 @@ export default {
       //初始化滚动事件监听
       document.body.scrollTop = 0;
       $(document).unbind('scroll');
+      this.firstitle()
     });
 
     util.vueEvent.$on("showloading", () => {
@@ -82,6 +83,7 @@ export default {
   color: #000000;
   font-size: 16px;
   height:100%;
+    background-image: -webkit-linear-gradient(140deg,#c1c1c1,#ffffff,#d4d4d4 90%,#ffffff);
 }
 
 html,body {

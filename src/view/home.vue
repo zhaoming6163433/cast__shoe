@@ -4,6 +4,8 @@
             <div v-for="(item,index) in roomlist" :key="index" class="roomitem" @click="gotodetail(item)">
                 <span>{{item.roominfo.roomname}}</span>
                 <span>{{item.roominfo.thingdesc}}</span>
+                <div class="roomflag">状态：{{item.roomflag|roomstate}}</div>
+                <mt-button v-if="item.createrip==userip&&item.roomflag==0" class="jiezhibtn" type="default" size="small" @click="stoproom(item,$event)">终止投票</mt-button>
                 <div v-if="item.createrip==userip" class="delroom" @click="delroom(item,$event)"><img src="../../static/img/delete.png"/></div>
             </div>
         </div>
@@ -39,8 +41,11 @@ export default {
         get_info() {
             this.socket.emit('getroomlist');
             this.socket.on('roomlist',  (data,ip)=> {
+                if(ip!=undefined){
+                    this.userip = ip;
+                }
                 this.roomlist = data;
-                this.userip = ip;
+
             });
         },
         //创建房间
@@ -56,6 +61,15 @@ export default {
             e.stopPropagation();
             this.$messagebox.confirm('删除后不可恢复，确认删除此房间？','').then(() => {
                 this.socket.emit('delroom',item);
+            },() => {
+
+            });
+        },
+        //终止投票
+        stoproom(item,e){
+            e.stopPropagation();
+            this.$messagebox.confirm('终止后不可恢复且进入房间后方可选择生成结果，确定终止吗？','').then(() => {
+                this.socket.emit('stoproom',item);
             },() => {
 
             });
@@ -85,10 +99,24 @@ export default {
                 margin-top:1rem;
                 padding: 0.5rem;
                 box-shadow: 0px 1px 3px rgb(190, 190, 190);
-                background-color: #FFFFFF;
+                background: rgba(255,255,255,0.8);
                 border: 1px solid #CCC;
                 border-radius: 1rem;
                 position: relative;
+                .jiezhibtn{
+                    height: 2rem;
+                    font-size: 1.2rem;
+                    width: 7rem;
+                    position: absolute;
+                    right:4rem;
+                    bottom:0.5rem;
+                }
+                .roomflag{
+                    position:absolute;
+                    bottom:0.5rem;
+                    font-size:1.2rem;
+                    color:$grey_c;
+                }
                 span:nth-child(1){
                     font-size:1.6rem;
                     width: 100%;
