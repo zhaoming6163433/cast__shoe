@@ -10,6 +10,7 @@
             </div>
         </div>
         <div class="addroom" @click="createroom"><img src="../../static/img/icon_jia.png"/></div>
+        <div v-show="haslist" class="haslist"><div>暂无房间</div><div style="font-size:1.6rem">点击右下角创建房间哦</div></div>
         <createroom  ref="createroom"></createroom>
   </div>
 </template>
@@ -24,6 +25,7 @@ export default {
     props: [],
     data() {
         return {
+            haslist:false,
             infomation: "",
             socket: "",
             userip:"",
@@ -45,7 +47,11 @@ export default {
                     this.userip = ip;
                 }
                 this.roomlist = data;
-
+                if(this.roomlist.length>0){
+                    this.haslist = false;
+                }else{
+                    this.haslist = true;
+                }
             });
         },
         //创建房间
@@ -106,7 +112,7 @@ export default {
                 .jiezhibtn{
                     height: 2rem;
                     font-size: 1.2rem;
-                    width: 7rem;
+                    width: 8rem;
                     position: absolute;
                     right:4rem;
                     bottom:0.5rem;
@@ -158,6 +164,11 @@ export default {
             img{
                 width:100%;
             }
+        }
+        .haslist{
+            font-size:2rem;
+            color:$bottle_grey_c;
+            line-height:4rem;
         }
     }
 </style>

@@ -28,7 +28,7 @@
       <div class="result animated flash" v-if="info.roomresultflag"><div>最终结果</div><div>{{info.roomresult&&info.roomresult.addthingsel}}</div></div>
       <div v-if="info.createrip==ip&&info.roomflag==1&&info.roomresultflag!=true" class="resultyes">
           <mt-button type="default" size="small" @click="zhijieresult">直接产生结果</mt-button>
-          <mt-button type="default" size="small">随机产生结果</mt-button>
+          <mt-button type="default" size="small" @click="suijiresult">随机产生结果</mt-button>
       </div>
   </div>
 </template>
@@ -66,12 +66,25 @@ export default {
         },
         //直接产生结果
         zhijieresult(){
-            util.vueSocket.emit('zhijieresult', { roomid: this.roomid});
+            this.$messagebox.confirm('确定要根据投票结果选出最多票数并在最多票数中产生结果？','').then(() => {
+                util.vueSocket.emit('zhijieresult', { roomid: this.roomid});
+            },() => {
+
+            });
+        },
+        //随机产生结果
+        suijiresult(){
+            this.$messagebox.confirm('确定跳转到随机游戏来根据权重值随机生成结果吗','').then(() => {
+                this.$router.replace({"name":"castshoe",query:{roomid: this.roomid}});
+            },() => {
+
+            });
         }
     },
     mounted() {
         let thisview = this;
         this.roomid = this.$route.query.roomid;
+        if(util.vueSocket) util.vueSocket.disconnect();
         //加入房间
         util.vueSocket = io.connect(appConfigs.urlWebHttp);
         util.vueSocket.emit('joinroom', { roomid: this.roomid });
@@ -200,7 +213,7 @@ export default {
                 top: -0.8rem;
                 left: 3rem;
                 color: #fff;
-                font-size: 1rem;
+                font-size: 1.2rem;
             }
         }
     }
@@ -214,6 +227,7 @@ export default {
         }
     }
     .result{
+            top:40%;
             width: 15rem;
             position: absolute;
             background-color: rgba(255,255,255,0.3);

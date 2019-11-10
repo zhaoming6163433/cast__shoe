@@ -14,6 +14,7 @@ import btn2 from 'static/img/btn2.png'
 import btn from 'static/img/btn.png'
 import back from 'static/img/back.png'
 import sound from 'static/audio/sound.mp3'
+import util from 'src/util/util.js'
 
 
 export default {
@@ -21,6 +22,7 @@ export default {
     props: [],
     data() {
         return {
+            roomid:"",
             proflag:true,
             progress:0,
             oGC: {},
@@ -31,6 +33,7 @@ export default {
             canvash:"",
             flagdrawrenwu:false,//是否展示人物
             flagdrawstart:true,//是否展示开始按钮
+            playbackmusic:"",
             startbtninfo:{//开始按钮的信息
                 positionx:"",
                 positiony:"",
@@ -99,28 +102,32 @@ export default {
             this.flagdrawstart = true;
         },
         touchstartfn(event){
-            var oC = document.getElementById('castshoe');
-            var touch = event.targetTouches;
-            for(var i=0;i<touch.length;i++){
-                var _x = touch[i].pageX-oC.offsetLeft;
-                var _y = touch[i].pageY-oC.offsetTop;
-                //判断是否点击开始
-                var startx = Math.abs(_x-this.startbtninfo.positionx);
-                var starty = Math.abs(_y-this.startbtninfo.positiony);
-                if(startx<this.startbtninfo.imgw/2&&starty<this.startbtninfo.imgh/2){
-                    this.playmusic("startGame");
-                    this.initshow();
-                    this.flagdrawrenwu = true;
-                    this.flagdrawstart = false;
-                    this.hoptext = this.randomfloor()+"！再来一次";
+            if(this.flagdrawstart){
+                if(this.hoptext.indexOf("结果")!=-1){
+                    clearInterval(this.playbackmusic);
+                    this.$router.replace({"name":"room",query:{roomid:this.roomid}});
+                    return;
+                }
+                this.sendresult();
+                util.vueSocket.on('roominfo', (data, ip) => {
+                    this.hoptext = "结果："+data.roomresult.addthingsel;
+                });
+                var oC = document.getElementById('castshoe');
+                var touch = event.targetTouches;
+                for(var i=0;i<touch.length;i++){
+                    var _x = touch[i].pageX-oC.offsetLeft;
+                    var _y = touch[i].pageY-oC.offsetTop;
+                    //判断是否点击开始
+                    var startx = Math.abs(_x-this.startbtninfo.positionx);
+                    var starty = Math.abs(_y-this.startbtninfo.positiony);
+                    if(startx<this.startbtninfo.imgw/2&&starty<this.startbtninfo.imgh/2){
+                        this.playmusic("startGame");
+                        this.initshow();
+                        this.flagdrawrenwu = true;
+                        this.flagdrawstart = false;
+                    }
                 }
             }
-        },
-        //随机楼层算法
-        randomfloor(){
-            var arr = ["二楼","三楼","四楼","五楼","六楼"];
-            var i = Math.floor(Math.random()*5);
-            return arr[i];
         },
         //初始化音乐文件
         initmusic(){
@@ -149,9 +156,14 @@ export default {
         //播出音乐
         playmusic(G){
             this.sound.play(G);
+        },
+        //调用产生随机结果
+        sendresult(){
+            util.vueSocket.emit('randomresult', { roomid: this.roomid});
         }
     },
     mounted() {
+        this.roomid = this.$route.query.roomid;
         var thisview = this;
         this.setcanvas();
         //适配
@@ -374,7 +386,7 @@ export default {
                 thisview.progress = thisview.progress+proinit;
                 if (loadindex == 5) {
                     thisview.playmusic("gem");
-                    setInterval(()=>{
+                    thisview.playbackmusic = setInterval(()=>{
                         thisview.playmusic("gem");
                     },8000);
                     thisview.proflag = false;
